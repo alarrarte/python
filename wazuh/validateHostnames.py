@@ -11,9 +11,10 @@ import sys
 def parse_arguments():
    parser = argparse.ArgumentParser()
    parser.add_argument("--file", "-f", help="path to client.keys file", required=True)
+   parser.add_argument("--continent", "-c", help="Specify the continent to group by", choices=["AS", "AF", "NA", "SA", "AN", "EU", "AU"])
    args = parser.parse_args()
    return args
-   
+      
 # opens hostnames file
 def process_hostnames(filepath):
     hostnames = []
@@ -93,6 +94,31 @@ def validate_hostnames(hostnames):
     return validated_list
 
 
+# Group By continent (list already validated)
+# Will not get incorrect named agents
+def group_by_continent_server(hostnames,c):
+    group = 0
+    web = 0
+    sql = 0
+    dat = 0
+
+    for hostname in hostnames:
+        if "- OK." in hostname: 
+            continent = hostname[0:2]
+            server     = hostname[2:5]
+            if (c == continent):
+                group += 1
+                if server == "WEB":
+                    web += 1
+                elif server == "SQL":
+                    sql += 1
+                else:
+                    dat += 1
+    print("- "+ c +" agents: - Total: "+ str(group) + " - Web: " + str(web) + " - SQL: " + str(sql) + " - DAT: " + str(dat))
+
+
+
+
 
 if __name__ == "__main__":
     # parse script arguments
@@ -102,5 +128,12 @@ if __name__ == "__main__":
     # script
     filepath = args.file
     hostnames = process_hostnames(filepath)
-    for host in validate_hostnames(hostnames):
-        print (host)
+    validated_hostnames = validate_hostnames(hostnames)
+   
+    
+    if args.continent is not None:
+        c = args.continent
+        group_by_continent_server(validated_hostnames,c)
+    else:
+        for hostname in validated_hostnames:
+            print (hostname)

@@ -16,6 +16,8 @@ def parse_arguments():
    parser.add_argument("--manager", "-m", help="Specify wazuh manager ip address where the agent will register", required=True)
    parser.add_argument("--agentname","-n", help="Specify the agent hostname", required=True)
    parser.add_argument("--agentip","-i", help="Specify the agent ip address", required=True)
+   parser.add_argument("--user", "-u", help="Specify the API user", required=True)
+   parser.add_argument("--password", "-p", help="Specify the API password", required=True)
    args = parser.parse_args()
    return args
     
@@ -50,8 +52,10 @@ if __name__ == "__main__":
     manager_ip = args.manager
     agent_ip = args.agentip
     agent_name = args.agentname
+    api_user = args.user
+    api_password = args.password
     base_url = "https://" + manager_ip + ":55000"
-    auth = requests.auth.HTTPBasicAuth('foo','bar')
+    auth = requests.auth.HTTPBasicAuth(api_user,api_password)
     verify = False
     data = {"name": agent_name,"ip": agent_ip}
     requests.packages.urllib3.disable_warnings()
